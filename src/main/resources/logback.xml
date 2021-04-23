@@ -1,0 +1,77 @@
+<configuration>
+    <property name="LOG_DIR" value="logs"/>
+    <property name="FULL_LOG" value="full.log"/>
+    <property name="ERROR_LOG" value="error.log"/>
+    <property name="APP_LOG" value="app.log"/>
+
+    <property name="coloredPattern"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%5p) %green([%15.15t]) %cyan(%-30.30logger{29}) \\(%F:%L\\): %m%n"/>
+    <property name="noColoredPattern"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%15.15t] %-30.30logger{29} \\(%F:%L\\): %m%n"/>
+
+    <!-- Stop output INFO at start -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${coloredPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${FULL_LOG}</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${noColoredPattern}</pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${FULL_LOG}.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>100</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>256MB</maxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <appender name="DAILY_ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${APP_LOG}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${APP_LOG}.%d{yyyy-MM-dd}</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${noColoredPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${ERROR_LOG}</file>
+        <encoder>
+            <pattern>${noColoredPattern}</pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${ERROR_LOG}.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>20MB</maxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!-- Custom Logging levels -->
+    <logger name="io.searchbox" level="OFF"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
